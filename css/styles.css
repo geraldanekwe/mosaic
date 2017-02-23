@@ -1,0 +1,42 @@
+#img-canvas {
+  width: 50%;
+  height: 50%;
+}
+
+#mosaic-wrap {
+  margin: auto;
+}
+
+#upload-btn {
+  position: absolute;
+  display : inline-block;
+  width : 80px;
+  height : 30px;
+  background : #CCC;
+  color : #FFF;
+  text-decoration : none;
+  line-height : 30px;
+  text-align : center;
+}
+
+#input {
+  border: 1px solid black;
+  position: absolute;
+  opacity: 0;
+  width: 80px;
+  height: 30px;
+  font-size: 25px;
+}
+
+#form {
+  position: relative;
+}
+
+.svg-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.no-hover {
+  pointer-events: none;
+}

@@ -1,0 +1,13 @@
+{
+  "author": "Canva",
+  "name": "mosaic",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "build": "babel js/client.js lib/ js/"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-preset-latest": "^6.16.0"
+  }
+}
