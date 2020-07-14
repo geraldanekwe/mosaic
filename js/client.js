@@ -1,40 +1,38 @@
-//NOTE: npm run build && npm run start
-//Adjusted the npm script to use babel
 'use strict';
 let handleUpload = (e) => {
-  let file = document.getElementById('input').files[0];
-  let reader = new FileReader();
-  let canvas = document.getElementById('img-canvas');
-  let context = canvas.getContext('2d');
-  let mosaic = document.getElementById('mosaic');
+  const file = document.getElementById('input').files[0];
+  const reader = new FileReader();
+  const canvas = document.getElementById('img-canvas');
+  const context = canvas.getContext('2d');
+  const mosaic = document.getElementById('mosaic');
   mosaic.innerHTML = '';
   if (context) {
     reader.onload = (event) => {
       let img, imgData, isValidRatio, tilesInRow, tilesInColumn, tileDimension, tiles = [];
       img = new Image();
       img.src = event.target.result;
-      let { width, height }  = img;
+      img.addEventListener('load', function (event) {
+        const { width, height } = img;
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(img, 0, 0);
+        imgData = context.getImageData(0, 0, width, height);
 
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(img, 0, 0);
-      imgData = context.getImageData(0, 0, width, height);
+        isValidRatio = checkAspectRatio(width, height);
+        if (!isValidRatio) {
+          mosaic.innerHTML += '<span>Please select an image with a valid aspect ratio. (e.g. 1:1 | 3:2 | 4:3 | 16:9 | 21:9)</span>';
+          return;
+        }
 
-      isValidRatio = checkAspectRatio(width, height);
-      if(!isValidRatio) {
-        mosaic.innerHTML += '<span>Please select an image with a valid aspect ratio. (e.g. 1:1 | 3:2 | 4:3 | 16:9 | 21:9)</span>';
-        return;
-      }
+        tileDimension = getTileDimensions(width, height);
+        tilesInRow = Math.floor(width / tileDimension);
+        tilesInColumn = Math.floor(height / tileDimension);
 
-      tileDimension = getTileDimensions(width, height);
-      tilesInRow = Math.floor(width/tileDimension);
-      tilesInColumn = Math.floor(height/tileDimension);
-
-      tiles = imgToTiles({ context, tileDimension, tilesInRow, tilesInColumn, width, height });
-      tiles = getAverageRGB(tiles);
-      tiles = rgbToHex(tiles);
-      renderTileRow({ mosaic, tiles, tilesInRow }, { index: 0, count: 0 });
-
+        tiles = imgToTiles({ context, tileDimension, tilesInRow, tilesInColumn, width, height });
+        tiles = getAverageRGB(tiles);
+        tiles = rgbToHex(tiles);
+        renderTileRow({ mosaic, tiles, tilesInRow }, { index: 0, count: 0 });
+      });
     } // end reader.onload
   } // end if context
   reader.readAsDataURL(file);
@@ -101,8 +99,7 @@ let rgbToHex = (tiles) => {
 let getTileDimensions = (width, height) => {
   //this function determines the size of the tile in pixels relative to the image
   //tile size is less than or equal to 5% of the width and/or height to achieve
-  //an optimal mosaic effect. a greater tile size will return less tiles and
-  //appear to not achieve a mosaic effect.
+  //an optimal mosaic effect.
   if (width === height) {
     //if the image is a square
     return width * .05;
@@ -193,14 +190,15 @@ let renderTileRow = ({ mosaic, tiles, tilesInRow }, { index, count }) => {
 
 
 
-//NOTE: Add-on to the challenge. While hovering over the mosaic.
-//Adjust the opacity on the uploaded image to show where the value comes from.
+//NOTE: While hovering over the mosaic.
+//Adjusts the opacity on the uploaded image to show where the value comes from.
 window.onload = () => {
   let mosaic = document.getElementById('mosaic');
   let canvas = document.getElementById('img-canvas');
   let context = canvas.getContext('2d');
 
-  mosaic.addEventListener('mouseover', (e) => {
+  const addOpacity = debounce((e) => {
+
     let classname = e.target.className;
     let { width, height } = canvas;
     let tileDimension = getTileDimensions(width, height);
@@ -213,9 +211,9 @@ window.onload = () => {
     context.putImageData(imgData, 0, 0);
 
     if (classname === 'svg-pill') {
-      let coordinates = e.target.getAttribute('data-coordinates').split(',');
+      const coordinates = e.target.getAttribute('data-coordinates').split(',');
       let x = parseInt(coordinates[0]), y = parseInt(coordinates[1]);
-      let tilesInRow = Math.floor(width/tileDimension),
+      const tilesInRow = Math.floor(width/tileDimension),
           tilesInColumn = Math.floor(height/tileDimension);
       let tileDimensionX, tileDimensionY;
       tileDimensionX = tileDimension;
@@ -241,17 +239,35 @@ window.onload = () => {
       }
       context.putImageData(tile, x, y);
     }
-  });
+  }, 200);
 
-  mosaic.addEventListener('mouseleave', (e) => {
+  const redrawImage = debounce((e) => {
     let { width, height } = canvas;
-    let tileDimension = getTileDimensions(width, height);
     let imgData = context.getImageData(0, 0, width, height);
     let { data } = imgData;
     for (let i = 0; i < data.length; i+=4) {
       imgData.data[i+3] = 255;
     }
     context.putImageData(imgData, 0, 0);
-  });
+  }, 100)
 
+  mosaic.addEventListener('mouseover', addOpacity);
+  mosaic.addEventListener('mouseleave', redrawImage);
+};
+
+//NOTE: debounce function used to prevent recalculating/redrawing the image with every mouse movement
+// Additional information about debounce can be found here: https://davidwalsh.name/javascript-debounce-function
+function debounce(func, wait, immediate) {
+  var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
 };

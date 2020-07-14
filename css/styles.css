@@ -1,35 +1,52 @@
-#img-canvas {
-  width: 50%;
-  height: 50%;
+body {
+  font-family: 'Oswald', sans-serif;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 #mosaic-wrap {
-  margin: auto;
-}
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+} 
 
-#upload-btn {
-  position: absolute;
-  display : inline-block;
-  width : 80px;
-  height : 30px;
-  background : #CCC;
-  color : #FFF;
-  text-decoration : none;
-  line-height : 30px;
-  text-align : center;
+#mosaic-wrap > canvas {
+  width: 50%;
 }
 
 #input {
-  border: 1px solid black;
-  position: absolute;
-  opacity: 0;
-  width: 80px;
-  height: 30px;
-  font-size: 25px;
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
 }
 
-#form {
-  position: relative;
+#input + label {
+  font-size: 1.25em;
+  font-weight: 700;
+  color: white;
+  background-color: black;
+  display: inline-block;
+  padding: 5px;
+}
+
+#input:focus + label,
+#input + label:hover {
+  opacity: 0.7;
+}
+
+#input + label {
+	cursor: pointer;
 }
 
 .svg-row {

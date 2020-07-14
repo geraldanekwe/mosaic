@@ -4,19 +4,24 @@
     <script type="text/javascript" src="js/mosaic.js"></script>
     <script type="text/javascript" src="js/client.js"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500&display=swap');
+    </style>
     <title>Mosaic</title>
   </head>
   <body>
-    <!-- Edit me. -->
-    <canvas id="img-canvas"></canvas>
-    <div id="mosaic-wrap">
-      <div id="mosaic"></div>
-    </div>
-    <form>
-      <div id="input-wrap">
-        <a href="#" id="upload-btn">Upload</a>
-        <input type="file" id="input" name="files[]" onchange="handleUpload()" />
+    <div class="page-wrap">
+      <h1>photo mosaic generator</h1>
+      <form>
+        <div id="input-wrap">
+          <input type="file" id="input" name="files[]" onchange="handleUpload()" />
+          <label for="input">upload</label>
+        </div>
+      </form>
+      <div id="mosaic-wrap">
+        <canvas id="img-canvas"></canvas>
+        <div id="mosaic"></div>
       </div>
-    </form>
+    </div>
   </body>
 </html>
