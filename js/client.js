@@ -1,5 +1,5 @@
 'use strict';
-let handleUpload = (e) => {
+const handleUpload = (e) => {
   const file = document.getElementById('input').files[0];
   const reader = new FileReader();
   const canvas = document.getElementById('img-canvas');
@@ -38,7 +38,7 @@ let handleUpload = (e) => {
   reader.readAsDataURL(file);
 }
 
-let checkAspectRatio = (width, height) => {
+const checkAspectRatio = (width, height) => {
   if (width === height) {
     return true;
   }
@@ -52,7 +52,7 @@ let checkAspectRatio = (width, height) => {
   return ratios.some(ratio => width/height === ratio);
 }
 
-let imgToTiles = ({ context, tileDimension, tilesInRow, tilesInColumn, width, height }) => {
+const imgToTiles = ({ context, tileDimension, tilesInRow, tilesInColumn, width, height }) => {
   //this function divides the image evenly into tiles
   //the tilesInRow/tilesInColumn variables are used to calculate x,y coordinates in the image
   //NOTE: additional information about this method can be found here:
@@ -82,7 +82,7 @@ let imgToTiles = ({ context, tileDimension, tilesInRow, tilesInColumn, width, he
   return tiles;
 }
 
-let rgbToHex = (tiles) => {
+const rgbToHex = (tiles) => {
   //this function converts rgb values to hex
   //NOTE: additional information about this method can be found here:
   // http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
@@ -96,7 +96,7 @@ let rgbToHex = (tiles) => {
   });
 }
 
-let getTileDimensions = (width, height) => {
+const getTileDimensions = (width, height) => {
   //this function determines the size of the tile in pixels relative to the image
   //tile size is less than or equal to 5% of the width and/or height to achieve
   //an optimal mosaic effect.
@@ -121,14 +121,14 @@ let getTileDimensions = (width, height) => {
   }
 }
 
-let getAverageRGB = (tiles) => {
+const getAverageRGB = (tiles) => {
   //this function reduces the rgba values of a single tile into an object
   //then divides by the number of pixels in the tile to get the average
   //NOTE: additional information about this method can be found here:
   // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
   return tiles.map((tile, index) => {
-    let { imgData: { data }, x, y } = tile;
-    let rgb = { r: 0, g: 0, b: 0, pixels: 0 };
+    const { imgData: { data }, x, y } = tile;
+    const rgb = { r: 0, g: 0, b: 0, pixels: 0 };
     for (let i = 0; i < data.length; i+=4) {
       rgb.r += data[i];
       rgb.g += data[i+1];
@@ -143,7 +143,7 @@ let getAverageRGB = (tiles) => {
   });
 }
 
-let getTileSVG = (hex) => {
+const getTileSVG = (hex) => {
   //this function returns an SVG from the /color/<hex> endpoint
   return new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();
@@ -160,7 +160,7 @@ let getTileSVG = (hex) => {
   });
 }
 
-let renderTileRow = ({ mosaic, tiles, tilesInRow }, { index, count }) => {
+const renderTileRow = ({ mosaic, tiles, tilesInRow }, { index, count }) => {
   //this function writes a row of tiles to the DOM.
   //in order to make use of asynchrony, an array of promises are built first.
   //once all promises in that array are resolved, the row is appended.
@@ -177,7 +177,7 @@ let renderTileRow = ({ mosaic, tiles, tilesInRow }, { index, count }) => {
 
   Promise.all(arr).then((svgs) => {
     for(let i = 0; i < tilesInRow; i++) {
-      let { x, y } = tiles[index + i];
+      const { x, y } = tiles[index + i];
       svgs[i] = `<div id="pill" class="svg-pill" data-coordinates="${x},${y}"><span class="no-hover">${svgs[i]}<span></div>`
     }
     let tileRow = svgs.join('');
@@ -193,15 +193,15 @@ let renderTileRow = ({ mosaic, tiles, tilesInRow }, { index, count }) => {
 //NOTE: While hovering over the mosaic.
 //Adjusts the opacity on the uploaded image to show where the value comes from.
 window.onload = () => {
-  let mosaic = document.getElementById('mosaic');
-  let canvas = document.getElementById('img-canvas');
-  let context = canvas.getContext('2d');
+  const mosaic = document.getElementById('mosaic');
+  const canvas = document.getElementById('img-canvas');
+  const context = canvas.getContext('2d');
 
   const addOpacity = debounce((e) => {
 
-    let classname = e.target.className;
-    let { width, height } = canvas;
-    let tileDimension = getTileDimensions(width, height);
+    const classname = e.target.className;
+    const { width, height } = canvas;
+    const tileDimension = getTileDimensions(width, height);
     let imgData = context.getImageData(0, 0, width, height);
     let { data } = imgData;
 
